@@ -17,7 +17,7 @@ EOF
 
 apt-get update
 base_packages=(
-  systemd-sysv dbus sudo locales network-manager network-manager-gnome
+  systemd-sysv dbus sudo locales udev network-manager network-manager-gnome
   live-boot live-config live-config-systemd
   plymouth plymouth-themes grub-pc-bin
   calamares polkitd pkexec
@@ -25,6 +25,9 @@ base_packages=(
   pipewire wireplumber pavucontrol
   curl wget ca-certificates gnupg
   file-roller p7zip-full gparted
+  udisks2 parted kpartx util-linux lvm2 cryptsetup
+  e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs
+  efibootmgr os-prober zstd
   desktop-base adwaita-icon-theme
 )
 
@@ -120,6 +123,7 @@ cp "$config_dir/calamares/branding.desc" "$config_dir/calamares/show.qml" /usr/s
 cp "$asset_dir/logo.png" "$asset_dir/wallpaper.png" /usr/share/calamares/branding/imiganeos/
 
 install -d /usr/share/applications /etc/skel/Desktop /home/imigane/Desktop
+install -m 0755 "$config_dir/desktop/imiganeos-installer.sh" /usr/local/bin/imiganeos-installer
 install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /usr/share/applications/imiganeos-install.desktop
 install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /etc/skel/Desktop/imiganeos-install.desktop
 install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /home/imigane/Desktop/imiganeos-install.desktop

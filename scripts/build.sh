@@ -107,7 +107,7 @@ cleanup
 rm -rf "$chroot_dir/tmp/imigane-assets" "$chroot_dir/tmp/imigane-config" "$chroot_dir/tmp/customize-chroot.sh"
 rm -rf "$chroot_dir/var/lib/apt/lists"/* "$chroot_dir/var/cache/apt/archives"/*.deb
 
-mksquashfs "$chroot_dir" "$iso_dir/live/filesystem.squashfs" -comp xz -b 1M -noappend -e boot
+mksquashfs "$chroot_dir" "$iso_dir/live/filesystem.squashfs" -comp xz -b 1M -noappend
 du -sx --block-size=1 "$chroot_dir" | cut -f1 > "$iso_dir/live/filesystem.size"
 chroot "$chroot_dir" dpkg-query -W --showformat='${Package} ${Version}\n' > "$iso_dir/live/filesystem.manifest"
 
@@ -118,7 +118,11 @@ cp "$asset_dir/wallpaper.png" "$iso_dir/boot/grub/themes/imigane/background.png"
 cp "$asset_dir"/select_*.png "$iso_dir/boot/grub/themes/imigane/"
 mkdir -p "$iso_dir/boot/grub/fonts"
 font_source="$(find /usr/share/grub /usr/share/grub2 -name unicode.pf2 -print -quit 2>/dev/null || true)"
-if [[ -n "$font_source" ]]; then cp "$font_source" "$iso_dir/boot/grub/fonts/unicode.pf2"; fi
+if [[ -z "$font_source" ]]; then
+  echo 'GRUB Unicode font was not found; refusing to create an unbootable theme.' >&2
+  exit 1
+fi
+cp "$font_source" "$iso_dir/boot/grub/fonts/unicode.pf2"
 
 cat > "$iso_dir/.disk-info" <<EOF
 ImiganeOS $version $flavor $arch_label — Brought to you by XProductions

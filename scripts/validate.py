@@ -17,6 +17,7 @@ required = [
     "config/plymouth/imigane.script",
     "config/grub/grub.cfg",
     "config/calamares/branding.desc",
+    "config/desktop/imiganeos-installer.sh",
 ]
 
 errors = []
@@ -43,6 +44,8 @@ if "xproductions.png" not in plymouth or "spinner.dot" not in plymouth:
 build_script = (ROOT / "scripts/build.sh").read_text(encoding="utf-8")
 if "i386) distribution=debian; suite=bookworm;" not in build_script:
     errors.append("The i386 build must use Debian 12 bookworm, the last Debian release with a 32-bit kernel")
+if re.search(r"mksquashfs[^\n]*\s-e\s+boot(?:\s|$)", build_script):
+    errors.append("The installed filesystem must include /boot, its kernel, and the ImiganeOS GRUB theme")
 
 customize_script = (ROOT / "scripts/customize-chroot.sh").read_text(encoding="utf-8")
 if "policykit-1" in customize_script:
@@ -57,6 +60,15 @@ if "ln -sf /etc/os-release /usr/lib/os-release" in customize_script:
     errors.append("Do not link os-release onto itself or create a circular /etc ↔ /usr/lib symlink")
 if "ln -sfn ../usr/lib/os-release /etc/os-release" not in customize_script:
     errors.append("Keep /etc/os-release as a relative symlink to /usr/lib/os-release")
+for package in ("udisks2", "parted", "kpartx", "e2fsprogs", "dosfstools"):
+    if package not in customize_script:
+        errors.append(f"The installer requires the {package} disk-detection or filesystem package")
+
+grub_theme = (ROOT / "config/grub/theme.txt").read_text(encoding="utf-8")
+if "terminal_*.png" in grub_theme:
+    errors.append("The GRUB theme must not reference terminal images that are not included in the ISO")
+if "DejaVu Sans" in grub_theme:
+    errors.append("The GRUB theme must only reference its bundled Unicode font")
 
 if errors:
     print("\n".join(errors), file=sys.stderr)
