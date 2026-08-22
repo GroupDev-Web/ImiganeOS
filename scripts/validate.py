@@ -51,6 +51,12 @@ if "apt.pop-os.org/release.key" in customize_script:
     errors.append("The removed Pop!_OS release.key URL must not be used")
 if "groupadd --system" not in customize_script:
     errors.append("Required live-user groups must be created before calling useradd")
+if "cat > /usr/lib/os-release <<EOF" not in customize_script:
+    errors.append("Write the ImiganeOS identity to the canonical /usr/lib/os-release file")
+if "ln -sf /etc/os-release /usr/lib/os-release" in customize_script:
+    errors.append("Do not link os-release onto itself or create a circular /etc ↔ /usr/lib symlink")
+if "ln -sfn ../usr/lib/os-release /etc/os-release" not in customize_script:
+    errors.append("Keep /etc/os-release as a relative symlink to /usr/lib/os-release")
 
 if errors:
     print("\n".join(errors), file=sys.stderr)

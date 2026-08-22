@@ -80,7 +80,7 @@ install -m 0644 "$asset_dir/logo.png" /usr/share/imiganeos/logo.png
 install -m 0644 "$asset_dir/logo.png" /usr/share/icons/hicolor/256x256/apps/imiganeos.png
 install -m 0644 "$asset_dir/wallpaper.png" /usr/share/backgrounds/imiganeos/imiganeos.png
 
-cat > /etc/os-release <<EOF
+cat > /usr/lib/os-release <<EOF
 NAME="ImiganeOS"
 PRETTY_NAME="ImiganeOS 1.0 Beta"
 ID=imiganeos
@@ -91,7 +91,7 @@ HOME_URL="https://github.com/GroupDev-Web/ImiganeOS"
 SUPPORT_URL="https://github.com/GroupDev-Web/ImiganeOS/issues"
 BUG_REPORT_URL="https://github.com/GroupDev-Web/ImiganeOS/issues"
 EOF
-ln -sf /etc/os-release /usr/lib/os-release
+ln -sfn ../usr/lib/os-release /etc/os-release
 
 install -d /usr/share/plymouth/themes/imigane
 cp "$config_dir/plymouth/imigane.plymouth" "$config_dir/plymouth/imigane.script" /usr/share/plymouth/themes/imigane/
