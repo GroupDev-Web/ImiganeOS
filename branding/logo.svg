@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">ImiganeOS</title>
+  <defs>
+    <linearGradient id="a" x1="0" y1="1" x2="1" y2="0">
+      <stop stop-color="#25d9bb"/><stop offset=".54" stop-color="#53a5ff"/><stop offset="1" stop-color="#9477ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M128 19 224 74v109l-96 55-96-55V74z" fill="url(#a)"/>
+  <path d="M128 46 201 88v80l-73 42-73-42V88z" fill="#101827"/>
+  <path d="M117 85h22v86h-22z" fill="#f3f8ff"/>
+  <circle cx="128" cy="71" r="11" fill="#6acaf8"/>
+  <path d="m75 128 30-29v20l-10 9 10 9v20zm106 0-30-29v20l10 9-10 9v20z" fill="#82b9ff"/>
+</svg>

@@ -1,0 +1,22 @@
+---
+componentName: imiganeos
+strings:
+  productName: ImiganeOS
+  shortProductName: ImiganeOS
+  version: "1.0 Beta"
+  shortVersion: "1.0"
+  versionedName: ImiganeOS 1.0 Beta
+  shortVersionedName: ImiganeOS 1.0
+  bootloaderEntryName: ImiganeOS
+  productUrl: https://github.com/GroupDev-Web/ImiganeOS
+  supportUrl: https://github.com/GroupDev-Web/ImiganeOS/issues
+  knownIssuesUrl: https://github.com/GroupDev-Web/ImiganeOS/issues
+images:
+  productLogo: logo.png
+  productIcon: logo.png
+  productWelcome: wallpaper.png
+slideshow: show.qml
+style:
+  sidebarBackground: "#101827"
+  sidebarText: "#eff5ff"
+  sidebarTextSelect: "#67bcff"

@@ -1,0 +1,111 @@
+name: Build ImiganeOS
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'website/**'
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: Edition to build, or all
+        type: choice
+        default: all
+        options: [all, budgie, xfce, cosmic]
+      architecture:
+        description: Processor architecture, or all
+        type: choice
+        default: all
+        options: [all, amd64, i386]
+      version:
+        description: Version label used in artifact filenames
+        type: string
+        default: 1.0-beta
+
+permissions:
+  contents: read
+
+concurrency:
+  group: imiganeos-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { flavor: budgie, arch: amd64, label: 'Budgie · x86_64', artifact: ImiganeOS-Budgie-x86_64 }
+          - { flavor: xfce, arch: amd64, label: 'XFCE · x86_64', artifact: ImiganeOS-XFCE-x86_64 }
+          - { flavor: cosmic, arch: amd64, label: 'COSMIC · x86_64', artifact: ImiganeOS-COSMIC-x86_64 }
+          - { flavor: budgie, arch: i386, label: 'Budgie · x86', artifact: ImiganeOS-Budgie-x86 }
+          - { flavor: xfce, arch: i386, label: 'XFCE · x86', artifact: ImiganeOS-XFCE-x86 }
+
+    steps:
+      - name: Check requested build selection
+        id: selected
+        shell: bash
+        run: |
+          flavor="${{ github.event.inputs.flavor || 'all' }}"
+          architecture="${{ github.event.inputs.architecture || 'all' }}"
+          if [[ "$flavor" != all && "$flavor" != '${{ matrix.flavor }}' ]]; then
+            echo 'build=false' >> "$GITHUB_OUTPUT"
+          elif [[ "$architecture" != all && "$architecture" != '${{ matrix.arch }}' ]]; then
+            echo 'build=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'build=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out ImiganeOS
+        if: steps.selected.outputs.build == 'true'
+        uses: actions/checkout@v4
+
+      - name: Make room for the ISO build
+        if: steps.selected.outputs.build == 'true'
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: Install image-building dependencies
+        if: steps.selected.outputs.build == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            debootstrap squashfs-tools xorriso mtools dosfstools rsync \
+            grub-pc-bin grub-efi-amd64-bin grub-efi-ia32-bin \
+            imagemagick librsvg2-bin fonts-dejavu-core
+
+      - name: Build bootable live ISO
+        if: steps.selected.outputs.build == 'true'
+        run: |
+          chmod +x scripts/*.sh
+          sudo ./scripts/build.sh \
+            --flavor '${{ matrix.flavor }}' \
+            --arch '${{ matrix.arch }}' \
+            --version '${{ github.event.inputs.version || '1.0-beta' }}'
+          sudo chown -R "$USER:$USER" dist
+
+      - name: Verify ISO and SHA256
+        if: steps.selected.outputs.build == 'true'
+        run: |
+          find dist -maxdepth 1 -type f -print
+          test "$(find dist -maxdepth 1 -name '*.iso' | wc -l)" -eq 1
+          cd dist
+          sha256sum -c ./*.sha256
+
+      - name: Upload ImiganeOS artifact
+        if: steps.selected.outputs.build == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            dist/*.iso
+            dist/*.iso.sha256
+            dist/*.json
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14

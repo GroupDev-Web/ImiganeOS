@@ -1,0 +1,51 @@
+title-text: "ImiganeOS"
+title-font: "DejaVu Sans Bold 28"
+title-color: "#f0f5ff"
+desktop-image: "background.png"
+desktop-color: "#101827"
+terminal-font: "Unifont Regular 16"
+terminal-box: "terminal_*.png"
+
++ image {
+  left = 50%-72
+  top = 12%
+  width = 144
+  height = 144
+  file = "logo.png"
+}
+
++ label {
+  left = 25%
+  top = 34%
+  width = 50%
+  height = 35
+  align = "center"
+  text = "Brought to you by XProductions"
+  color = "#bfd0e5"
+  font = "DejaVu Sans Regular 16"
+}
+
++ boot_menu {
+  left = 25%
+  top = 43%
+  width = 50%
+  height = 35%
+  item_font = "DejaVu Sans Regular 18"
+  item_color = "#d3deed"
+  selected_item_color = "#73c8ff"
+  item_height = 42
+  item_padding = 12
+  item_spacing = 8
+  selected_item_pixmap_style = "select_*.png"
+}
+
++ label {
+  left = 20%
+  top = 92%
+  width = 60%
+  height = 24
+  align = "center"
+  text = "ImiganeOS 1.0 Beta"
+  color = "#8799af"
+  font = "DejaVu Sans Regular 14"
+}

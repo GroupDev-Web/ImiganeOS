@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install ImiganeOS
+GenericName=System Installer
+Comment=Install ImiganeOS on this computer
+Exec=pkexec calamares
+Icon=imiganeos
+Terminal=false
+Categories=System;Settings;
+StartupNotify=true

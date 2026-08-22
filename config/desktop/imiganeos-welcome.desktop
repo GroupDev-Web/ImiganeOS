@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Welcome to ImiganeOS
+Exec=imiganeos-welcome
+Icon=imiganeos
+Terminal=false
+Categories=System;
+X-GNOME-Autostart-enabled=true

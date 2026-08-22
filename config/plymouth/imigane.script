@@ -1,0 +1,59 @@
+Window.SetBackgroundTopColor(0.055, 0.082, 0.137);
+Window.SetBackgroundBottomColor(0.035, 0.055, 0.098);
+
+screen.width = Window.GetWidth();
+screen.height = Window.GetHeight();
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.sprite.SetX(screen.width / 2 - logo.image.GetWidth() / 2);
+logo.sprite.SetY(screen.height / 2 - logo.image.GetHeight() - 45);
+logo.sprite.SetZ(10);
+
+name.image = Image.Text("ImiganeOS", 1.0, 1.0, 1.0, "DejaVu Sans Bold 30");
+name.sprite = Sprite(name.image);
+name.sprite.SetX(screen.width / 2 - name.image.GetWidth() / 2);
+name.sprite.SetY(screen.height / 2 - 22);
+name.sprite.SetZ(10);
+
+credit.image = Image("xproductions.png");
+credit.sprite = Sprite(credit.image);
+credit.sprite.SetX(screen.width / 2 - credit.image.GetWidth() / 2);
+credit.sprite.SetY(screen.height / 2 + 41);
+credit.sprite.SetZ(10);
+
+spinner.center_x = screen.width / 2;
+spinner.center_y = screen.height / 2 + 128;
+spinner.radius = 22;
+spinner.angle = 0;
+spinner.count = 12;
+
+for (i = 0; i < spinner.count; i++) {
+  spinner.dot[i].image = Image("spinner-dot.png");
+  spinner.dot[i].sprite = Sprite(spinner.dot[i].image);
+  spinner.dot[i].sprite.SetZ(20);
+}
+
+fun refresh_callback() {
+  spinner.angle += 0.075;
+  for (i = 0; i < spinner.count; i++) {
+    angle = 2 * Math.Pi * i / spinner.count;
+    x = spinner.center_x + Math.Cos(angle) * spinner.radius - 4;
+    y = spinner.center_y + Math.Sin(angle) * spinner.radius - 4;
+    spinner.dot[i].sprite.SetX(x);
+    spinner.dot[i].sprite.SetY(y);
+    phase = (Math.Sin(spinner.angle * 3 - angle) + 1) / 2;
+    spinner.dot[i].sprite.SetOpacity(0.15 + phase * 0.85);
+  }
+}
+
+Plymouth.SetRefreshFunction(refresh_callback);
+
+fun message_callback(text) {
+  status.image = Image.Text(text, 0.75, 0.82, 0.91, "DejaVu Sans 12");
+  status.sprite = Sprite(status.image);
+  status.sprite.SetX(screen.width / 2 - status.image.GetWidth() / 2);
+  status.sprite.SetY(screen.height - 55);
+}
+
+Plymouth.SetMessageFunction(message_callback);

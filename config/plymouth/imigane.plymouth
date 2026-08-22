@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=ImiganeOS
+Description=ImiganeOS animated boot screen by XProductions
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/imigane
+ScriptFile=/usr/share/plymouth/themes/imigane/imigane.script
