@@ -20,7 +20,7 @@ base_packages=(
   systemd-sysv dbus sudo locales network-manager network-manager-gnome
   live-boot live-config live-config-systemd
   plymouth plymouth-themes grub-pc-bin
-  calamares policykit-1
+  calamares polkitd pkexec
   xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core
   pipewire wireplumber pavucontrol
   curl wget ca-certificates gnupg
@@ -44,7 +44,10 @@ case "$flavor" in
     fi
     apt-get install -y --no-install-recommends ca-certificates curl gnupg
     install -d -m 0755 /etc/apt/keyrings
-    curl -fsSL https://apt.pop-os.org/release.key | gpg --dearmor -o /etc/apt/keyrings/pop-os.gpg
+    pop_key_fingerprint=63C46DF0140D738961429F4E204DD8AEC33A7AFF
+    curl --fail --show-error --location --retry 3 \
+      "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${pop_key_fingerprint}" \
+      | gpg --dearmor --yes --output /etc/apt/keyrings/pop-os.gpg
     echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/pop-os.gpg] http://apt.pop-os.org/release noble main' > /etc/apt/sources.list.d/pop-os.list
     apt-get update
     if ! apt-cache show cosmic-session >/dev/null 2>&1; then
@@ -62,6 +65,11 @@ sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 update-locale LANG=en_US.UTF-8
 
+for required_group in sudo audio video netdev plugdev; do
+  if ! getent group "$required_group" >/dev/null; then
+    groupadd --system "$required_group"
+  fi
+done
 useradd --create-home --shell /bin/bash --groups sudo,audio,video,netdev,plugdev imigane
 echo 'imigane:imigane' | chpasswd
 echo 'imigane ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/90-imigane-live

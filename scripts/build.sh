@@ -35,7 +35,7 @@ fi
 
 case "$architecture" in
   amd64) distribution=ubuntu; suite=noble; mirror=http://archive.ubuntu.com/ubuntu; arch_label=x86_64; efi_target=x86_64-efi ;;
-  i386) distribution=debian; suite=trixie; mirror=http://deb.debian.org/debian; arch_label=x86; efi_target=i386-efi ;;
+  i386) distribution=debian; suite=bookworm; mirror=http://deb.debian.org/debian; arch_label=x86; efi_target=i386-efi ;;
 esac
 
 job_name="${flavor}-${arch_label}"

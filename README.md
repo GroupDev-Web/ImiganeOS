@@ -7,10 +7,10 @@ ImiganeOS is a desktop operating system from XProductions, built as a bootable l
 | Budgie | x86_64 | Ubuntu 24.04 LTS | BIOS + UEFI |
 | XFCE | x86_64 | Ubuntu 24.04 LTS | BIOS + UEFI |
 | COSMIC | x86_64 | Ubuntu 24.04 LTS + Pop!_OS packages | BIOS + UEFI |
-| Budgie | x86 | Debian 13 | BIOS + 32-bit UEFI |
-| XFCE | x86 | Debian 13 | BIOS + 32-bit UEFI |
+| Budgie | x86 | Debian 12 | BIOS + 32-bit UEFI |
+| XFCE | x86 | Debian 12 | BIOS + 32-bit UEFI |
 
-COSMIC is intentionally unavailable for x86. Ubuntu no longer provides a complete 32-bit distribution, so x86 editions use Debian instead.
+COSMIC is intentionally unavailable for x86. Ubuntu no longer provides a complete 32-bit distribution, and Debian 13 removed its i386 kernel, so x86 editions use Debian 12 instead.
 
 ## Building
 
