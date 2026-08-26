@@ -9,7 +9,7 @@ config_dir=/tmp/imigane-config
 echo imagineos > /etc/hostname
 printf '127.0.0.1 localhost\n127.0.1.1 imagineos\n::1 localhost ip6-localhost ip6-loopback\n' > /etc/hosts
 apt-get update
-packages=(systemd-sysv dbus sudo locales udev network-manager network-manager-gnome live-boot live-config live-config-systemd plymouth plymouth-themes grub-pc-bin calamares polkitd pkexec xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core pipewire wireplumber pavucontrol curl wget git ca-certificates gnupg rsync sassc file-roller p7zip-full gparted udisks2 parted kpartx util-linux lvm2 cryptsetup e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs efibootmgr os-prober zstd desktop-base adwaita-icon-theme xfce4 xfce4-goodies lightdm light-locker lightdm-gtk-greeter thunar mousepad picom)
+packages=(systemd-sysv dbus sudo locales udev network-manager network-manager-gnome live-boot live-config live-config-systemd user-setup plymouth plymouth-themes grub-pc-bin calamares polkitd pkexec xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core pipewire wireplumber pavucontrol curl wget git ca-certificates gnupg rsync sassc file-roller p7zip-full gparted udisks2 parted kpartx util-linux lvm2 cryptsetup e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs efibootmgr os-prober zstd desktop-base adwaita-icon-theme xfce4 xfce4-goodies lightdm light-locker lightdm-gtk-greeter thunar mousepad picom)
 if [[ "$distribution" == ubuntu ]]; then
   packages+=(linux-image-generic linux-firmware grub-efi-amd64-bin firefox)
 else
