@@ -30,8 +30,8 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 case "$architecture" in
-  amd64) distribution=ubuntu; suite=noble; mirror=http://archive.ubuntu.com/ubuntu; arch_label=x86_64; efi_target=x86_64-efi ;;
-  i386) distribution=debian; suite=bookworm; mirror=http://deb.debian.org/debian; arch_label=x86; efi_target=i386-efi ;;
+  amd64) distribution=ubuntu; suite=noble; mirror=http://archive.ubuntu.com/ubuntu; arch_label=x86_64 ;;
+  i386) distribution=debian; suite=bookworm; mirror=http://deb.debian.org/debian; arch_label=x86 ;;
 esac
 
 job_name="${edition}-${arch_label}"
@@ -105,6 +105,8 @@ rm -rf "$chroot_dir/var/lib/apt/lists"/* "$chroot_dir/var/cache/apt/archives"/*.
 
 mksquashfs "$chroot_dir" "$iso_dir/live/filesystem.squashfs" -comp xz -b 1M -noappend
 du -sx --block-size=1 "$chroot_dir" | cut -f1 > "$iso_dir/live/filesystem.size"
+# dpkg-query expands these placeholders itself; they must remain literal here.
+# shellcheck disable=SC2016
 chroot "$chroot_dir" dpkg-query -W --showformat='${Package} ${Version}\n' > "$iso_dir/live/filesystem.manifest"
 
 cp "$root_dir/config/grub/grub.cfg" "$iso_dir/boot/grub/grub.cfg"
