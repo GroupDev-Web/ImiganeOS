@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="ImagineOS — Linux built to recreate familiar Windows desktop eras.">
+  <meta name="theme-color" content="#07111f">
+  <title>ImagineOS</title>
+  <link rel="icon" href="branding/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <header class="nav shell">
+    <a class="brand" href="#top" aria-label="ImagineOS home">
+      <img src="branding/logo.svg" alt="">
+      <span>ImagineOS</span>
+    </a>
+    <nav>
+      <a href="#editions">Editions</a>
+      <a href="#about">About</a>
+      <a href="https://github.com/GroupDev-Web/ImiganeOS">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="kicker">ImagineOS 1.0 Beta</p>
+        <h1>Linux,<br><span>rewound.</span></h1>
+        <p class="lede">A Linux distro built to mimic the Windows desktops people actually remember — from 95 through 11 — without pretending to be Windows underneath.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#editions">Choose an edition</a>
+          <a class="button ghost" href="https://github.com/GroupDev-Web/ImiganeOS">View source</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="window window-back">
+          <div class="titlebar"><i></i><i></i><i></i></div>
+          <div class="window-grid"></div>
+        </div>
+        <div class="window window-front">
+          <div class="titlebar"><span>ImagineOS</span><b>— □ ×</b></div>
+          <div class="desktop-preview">
+            <img src="branding/logo.svg" alt="">
+            <strong>Choose your era.</strong>
+            <small>Same Linux core. Different memories.</small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="marquee" aria-hidden="true">
+      <div>WINDOWS 95 • WINDOWS XP • WINDOWS VISTA • WINDOWS 7 • WINDOWS 10 • WINDOWS 11 •&nbsp;</div>
+    </section>
+
+    <section class="shell section" id="editions">
+      <div class="section-head">
+        <div>
+          <p class="kicker">Pick your desktop</p>
+          <h2>Six eras. Two architectures.</h2>
+        </div>
+        <span class="build-status" id="build-status">Checking latest builds…</span>
+      </div>
+
+      <div class="edition-grid" id="edition-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="shell section about" id="about">
+      <div>
+        <p class="kicker">What it is</p>
+        <h2>Familiar on purpose.</h2>
+      </div>
+      <div class="about-copy">
+        <p>ImagineOS is a Linux distribution focused on recreating recognizable Windows-era desktop experiences. Each edition changes the visual experience while keeping the same Linux foundation underneath.</p>
+        <p>It is not Windows, does not include Microsoft Windows, and is not affiliated with Microsoft.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell footer">
+    <div class="brand mini"><img src="branding/logo.svg" alt=""><span>ImagineOS</span></div>
+    <p>Brought to you by XProductions.</p>
+  </footer>
+
+  <script src="site.js"></script>
+</body>
+</html>
