@@ -1,39 +1,42 @@
-# ImiganeOS Beta
+# ImagineOS Beta
 
-ImiganeOS is a desktop operating system from XProductions, built as a bootable live ISO with an integrated Calamares installer.
+ImagineOS is a Linux distribution from XProductions designed to recreate familiar Windows desktop eras. It boots as a live system and includes a branded Calamares installer.
 
-| Edition | Architecture | Foundation | Firmware |
-| --- | --- | --- | --- |
-| Budgie | x86_64 | Ubuntu 24.04 LTS | BIOS + UEFI |
-| XFCE | x86_64 | Ubuntu 24.04 LTS | BIOS + UEFI |
-| COSMIC | x86_64 | Ubuntu 24.04 LTS + Pop!_OS packages | BIOS + UEFI |
-| Budgie | x86 | Debian 12 | BIOS + 32-bit UEFI |
-| XFCE | x86 | Debian 12 | BIOS + 32-bit UEFI |
+## Editions
 
-COSMIC is intentionally unavailable for x86. Ubuntu no longer provides a complete 32-bit distribution, and Debian 13 removed its i386 kernel, so x86 editions use Debian 12 instead.
+| Edition | Theme source | Login / lock styling |
+| --- | --- | --- |
+| Windows 95 | [Chicago95](https://github.com/grassmunk/Chicago95) | Chicago95 LightDM greeter |
+| Windows XP | [xfce-winxp-tc](https://github.com/rozniak/xfce-winxp-tc) | Matching GTK LightDM theme |
+| Windows Vista | [ReVista](https://github.com/x35gaming/revista) | Matching GTK LightDM theme |
+| Windows 7 | [Aero Glass](https://github.com/xRUS47x/Aero-Glass-XFCE4) | Matching GTK LightDM theme |
+| Windows 10 | [Windows 10 theme](https://www.xfce-look.org/p/1216281) / [maintained source](https://github.com/B00merang-Project/Windows-10) | Matching GTK LightDM theme |
+| Windows 11 | [Win11 GTK](https://github.com/yeyushengfan258/Win11-gtk-theme) + [icons](https://github.com/yeyushengfan258/Win11-icon-theme) | Matching GTK LightDM theme |
+
+Every edition uses the same lightweight desktop foundation internally. ImagineOS product pages and downloads identify the Windows experience, not the underlying desktop environment.
+
+All six editions build for x86_64 on Ubuntu 24.04 LTS and x86 on Debian 12. Debian 12 is used for x86 because modern Ubuntu no longer provides a complete 32-bit desktop base.
 
 ## Building
 
-GitHub Actions builds all five editions automatically on pushes to `main`, and can also be started from **Actions → Build ImiganeOS → Run workflow**. Each successful job uploads an individual ISO artifact containing its checksum and build metadata.
-
-For a local build on an Ubuntu or Debian amd64 host:
+GitHub Actions builds twelve ISO artifacts on pushes to `main`. A single edition or architecture can also be selected from **Actions → Build ImagineOS → Run workflow**.
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y debootstrap squashfs-tools xorriso grub-pc-bin grub-efi-amd64-bin grub-efi-ia32-bin mtools dosfstools rsync imagemagick librsvg2-bin
-sudo ./scripts/build.sh --flavor xfce --arch amd64
-sudo ./scripts/build.sh --flavor budgie --arch i386
+sudo ./scripts/build.sh --edition win95 --arch amd64
+sudo ./scripts/build.sh --edition winxp --arch i386
 ```
 
-The finished image and SHA256 checksum are written to `dist/`.
+Finished ISOs, checksums, and build metadata are written to `dist/`.
 
 ## Identity
 
-- Name: ImiganeOS
+- Name: ImagineOS
 - Version: 1.0 Beta
 - Publisher: XProductions
-- Live account: `imigane`, with password `imigane`
-- Installer: branded Calamares desktop shortcut
-- Boot branding: custom GRUB theme and animated Plymouth splash
+- Live account is created at boot by Debian live-config and is not copied as a permanent installer account
+- Installer: Calamares
+- Boot branding: custom GRUB and animated Plymouth screens
 
-COSMIC uses System76's signed Pop!_OS package repository. Its build deliberately fails if the real COSMIC session cannot be installed; it never substitutes another desktop.
+Windows names and visual assets remain the property of their respective owners. ImagineOS is not affiliated with or endorsed by Microsoft.

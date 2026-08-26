@@ -10,7 +10,7 @@ logo.sprite.SetX(screen.width / 2 - logo.image.GetWidth() / 2);
 logo.sprite.SetY(screen.height / 2 - logo.image.GetHeight() - 45);
 logo.sprite.SetZ(10);
 
-name.image = Image.Text("ImiganeOS", 1.0, 1.0, 1.0, "DejaVu Sans Bold 30");
+name.image = Image.Text("ImagineOS", 1.0, 1.0, 1.0, "DejaVu Sans Bold 30");
 name.sprite = Sprite(name.image);
 name.sprite.SetX(screen.width / 2 - name.image.GetWidth() / 2);
 name.sprite.SetY(screen.height / 2 - 22);

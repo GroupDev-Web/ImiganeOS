@@ -1,13 +1,13 @@
 ---
-componentName: imiganeos
+componentName: imagineos
 strings:
-  productName: ImiganeOS
-  shortProductName: ImiganeOS
+  productName: ImagineOS
+  shortProductName: ImagineOS
   version: "1.0 Beta"
   shortVersion: "1.0"
-  versionedName: ImiganeOS 1.0 Beta
-  shortVersionedName: ImiganeOS 1.0
-  bootloaderEntryName: ImiganeOS
+  versionedName: ImagineOS 1.0 Beta
+  shortVersionedName: ImagineOS 1.0
+  bootloaderEntryName: ImagineOS
   productUrl: https://github.com/GroupDev-Web/ImiganeOS
   supportUrl: https://github.com/GroupDev-Web/ImiganeOS/issues
   knownIssuesUrl: https://github.com/GroupDev-Web/ImiganeOS/issues

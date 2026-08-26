@@ -19,7 +19,7 @@ Rectangle {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: "Welcome to ImiganeOS"
+            text: "Welcome to ImagineOS"
             color: "#f3f7ff"
             font.pixelSize: 34
             font.bold: true

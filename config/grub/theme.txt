@@ -1,4 +1,4 @@
-title-text: "ImiganeOS"
+title-text: "ImagineOS"
 title-font: "Unifont Regular 16"
 title-color: "#f0f5ff"
 desktop-image: "background.png"
@@ -43,7 +43,7 @@ terminal-font: "Unifont Regular 16"
   width = 60%
   height = 24
   align = "center"
-  text = "ImiganeOS 1.0 Beta"
+  text = "ImagineOS 1.0 Beta"
   color = "#8799af"
   font = "Unifont Regular 16"
 }

@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="ImiganeOS Beta. Choose Budgie, XFCE, or COSMIC and download the latest build.">
+  <meta name="description" content="ImagineOS Beta. Linux made to feel like classic and modern Windows desktops.">
   <meta name="theme-color" content="#101827">
-  <title>ImiganeOS</title>
+  <title>ImagineOS</title>
   <link rel="icon" href="../branding/logo.svg" type="image/svg+xml">
   <style>
     :root{color-scheme:dark;--paper:#101827;--ink:#f3f6fd;--muted:#a9b5ca;--line:#293549;--blue:#75baff;--teal:#61d7bb}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 76% 14%,#25365d 0,#101827 46%,#0b101a 100%);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}.wrap{max-width:1110px;margin:auto;padding:38px 24px 72px}header{display:flex;justify-content:space-between;align-items:center}.brand{display:flex;align-items:center;gap:13px;font-size:20px;font-weight:700}.brand img{width:43px;height:43px}.source{color:var(--muted);text-decoration:none}.hero{padding:111px 0 71px;max-width:780px}.eyebrow{color:var(--teal);font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(51px,10vw,94px);line-height:.98;letter-spacing:-5px;margin:17px 0}.hero p{max-width:570px;color:var(--muted);font-size:19px}.downloads{margin-top:30px}.head{display:flex;justify-content:space-between;align-items:end;border-bottom:1px solid var(--line);padding-bottom:14px}.head h2{margin:0;font-size:26px}.status{font-size:13px;color:var(--muted)}.edition{display:grid;grid-template-columns:1.2fr 1fr auto;align-items:center;gap:22px;padding:24px 0;border-bottom:1px solid var(--line)}.name{font-weight:650;font-size:19px}.detail{color:var(--muted);font-size:14px}.download{display:inline-flex;align-items:center;justify-content:center;min-width:154px;padding:11px 16px;border:1px solid #476483;border-radius:8px;text-decoration:none;color:var(--ink);transition:border-color .15s,background .15s}.download:hover{border-color:var(--blue);background:#1e3048}.download[aria-disabled=true]{pointer-events:none;opacity:.5}.foot{display:flex;justify-content:space-between;padding-top:42px;color:var(--muted);font-size:13px}@media(max-width:660px){.hero{padding:84px 0 47px}.hero h1{letter-spacing:-3px}.edition{grid-template-columns:1fr auto;gap:8px}.edition .detail{grid-column:1;grid-row:2}.download{grid-column:2;grid-row:1/3;min-width:113px}.foot{display:block}.foot span{display:block;margin-top:6px}}
@@ -13,22 +13,21 @@
 </head>
 <body>
   <main class="wrap">
-    <header><a class="brand" href="#" style="text-decoration:none;color:inherit"><img src="../branding/logo.svg" alt="">ImiganeOS</a><a class="source" href="https://github.com/GroupDev-Web/ImiganeOS">GitHub ↗</a></header>
-    <section class="hero"><div class="eyebrow">1.0 Beta</div><h1>Made to feel<br>like yours.</h1><p>An open desktop with room to make it your own. Choose the edition that fits your machine and get started.</p></section>
+    <header><a class="brand" href="#" style="text-decoration:none;color:inherit"><img src="../branding/logo.svg" alt="">ImagineOS</a><a class="source" href="https://github.com/GroupDev-Web/ImiganeOS">GitHub ↗</a></header>
+    <section class="hero"><div class="eyebrow">1.0 Beta</div><h1>Linux that feels<br>familiar.</h1><p>Choose the Windows era you remember. ImagineOS recreates its desktop experience while remaining a real Linux system underneath.</p></section>
     <section class="downloads" aria-labelledby="downloads-title"><div class="head"><h2 id="downloads-title">Choose your edition</h2><span class="status" id="status" aria-live="polite">Checking builds…</span></div><div id="editions"></div></section>
-    <footer class="foot"><span>Brought to you by XProductions</span><span>ImiganeOS 1.0 Beta</span></footer>
+    <footer class="foot"><span>Brought to you by XProductions</span><span>ImagineOS 1.0 Beta</span></footer>
   </main>
   <script>
     const repo = 'GroupDev-Web/ImiganeOS';
     const editions = [
-      {label:'Budgie',arch:'x86_64',base:'Ubuntu',artifact:'ImiganeOS-Budgie-x86_64'},
-      {label:'XFCE',arch:'x86_64',base:'Ubuntu',artifact:'ImiganeOS-XFCE-x86_64'},
-      {label:'COSMIC',arch:'x86_64',base:'Ubuntu',artifact:'ImiganeOS-COSMIC-x86_64'},
-      {label:'Budgie',arch:'x86',base:'Debian',artifact:'ImiganeOS-Budgie-x86'},
-      {label:'XFCE',arch:'x86',base:'Debian',artifact:'ImiganeOS-XFCE-x86'}
+      ...['Windows 95','Windows XP','Windows Vista','Windows 7','Windows 10','Windows 11'].flatMap(label => {
+        const slug={'Windows 95':'95','Windows XP':'XP','Windows Vista':'Vista','Windows 7':'7','Windows 10':'10','Windows 11':'11'}[label];
+        return [{label,arch:'x86_64',base:'64-bit',artifact:`ImagineOS-Windows-${slug}-x86_64`},{label,arch:'x86',base:'32-bit',artifact:`ImagineOS-Windows-${slug}-x86`}];
+      })
     ];
     const holder=document.getElementById('editions');
-    function render(artifacts){holder.innerHTML='';for(const edition of editions){const artifact=artifacts.find(item=>item.name===edition.artifact&&!item.expired);const item=document.createElement('article');item.className='edition';const name=document.createElement('div');name.className='name';name.textContent=edition.label+' · '+edition.arch;const detail=document.createElement('div');detail.className='detail';detail.textContent=edition.base+' · '+(artifact?new Date(artifact.created_at).toLocaleDateString(): 'Build pending');const link=document.createElement('a');link.className='download';link.textContent=artifact?'Download':'Pending';link.href=artifact?'https://github.com/'+repo+'/actions/runs/'+artifact.workflow_run.id+'/artifacts/'+artifact.id:'https://github.com/'+repo+'/actions';if(!artifact)link.setAttribute('aria-disabled','true');item.append(name,detail,link);holder.append(item)}}
+    function render(artifacts){holder.innerHTML='';for(const edition of editions){const artifact=artifacts.find(item=>item.name===edition.artifact&&!item.expired);const item=document.createElement('article');item.className='edition';const name=document.createElement('div');name.className='name';name.textContent=edition.label+' · '+edition.arch;const detail=document.createElement('div');detail.className='detail';detail.textContent=edition.base+' · '+(artifact?new Date(artifact.created_at).toLocaleDateString(): 'Build pending');const link=document.createElement('a');link.className='download';link.textContent=artifact?'Download':'Pending';link.href=artifact?'https://nightly.link/'+repo+'/workflows/build.yml/main/'+edition.artifact+'.zip':'https://github.com/'+repo+'/actions';if(!artifact)link.setAttribute('aria-disabled','true');item.append(name,detail,link);holder.append(item)}}
     render([]);
     fetch('https://api.github.com/repos/'+repo+'/actions/artifacts?per_page=100',{headers:{Accept:'application/vnd.github+json'}}).then(async response=>{if(!response.ok)throw Error('Artifacts unavailable');return response.json()}).then(data=>{const artifacts=(data.artifacts||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));render(artifacts);const available=editions.filter(edition=>artifacts.some(item=>item.name===edition.artifact&&!item.expired)).length;document.getElementById('status').textContent=available?available+' editions ready':'First builds running'}).catch(()=>{document.getElementById('status').textContent='Builds updating'});
   </script>

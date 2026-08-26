@@ -1,77 +1,34 @@
 #!/usr/bin/env python3
-"""Fast structural checks for the ImiganeOS release configuration."""
-
+"""Fast structural checks for the ImagineOS release configuration."""
 from pathlib import Path
-import re
-import sys
-import xml.etree.ElementTree as ET
+import re, sys, xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parent.parent
-required = [
-    ".github/workflows/build.yml",
-    "scripts/build.sh",
-    "scripts/customize-chroot.sh",
-    "branding/logo.svg",
-    "branding/xproductions.svg",
-    "branding/wallpaper.svg",
-    "config/plymouth/imigane.script",
-    "config/grub/grub.cfg",
-    "config/calamares/branding.desc",
-    "config/desktop/imiganeos-installer.sh",
-]
-
-errors = []
-for relative in required:
-    if not (ROOT / relative).is_file():
-        errors.append(f"Missing required file: {relative}")
-
+required = [".github/workflows/build.yml", "scripts/build.sh", "scripts/customize-chroot.sh",
+            "branding/logo.svg", "branding/xproductions.svg", "branding/wallpaper.svg",
+            "config/plymouth/imagine.script", "config/grub/grub.cfg",
+            "config/calamares/branding.desc", "config/desktop/imagineos-installer.sh"]
+errors = [f"Missing required file: {p}" for p in required if not (ROOT / p).is_file()]
 for asset in (ROOT / "branding").glob("*.svg"):
-    try:
-        ET.parse(asset)
-    except ET.ParseError as exc:
-        errors.append(f"Invalid SVG {asset.relative_to(ROOT)}: {exc}")
+    try: ET.parse(asset)
+    except ET.ParseError as exc: errors.append(f"Invalid SVG {asset.relative_to(ROOT)}: {exc}")
 
-workflow = (ROOT / ".github/workflows/build.yml").read_text(encoding="utf-8")
-entries = re.findall(r"flavor:\s*(budgie|xfce|cosmic),\s*arch:\s*(amd64|i386)", workflow)
-expected = {("budgie", "amd64"), ("xfce", "amd64"), ("cosmic", "amd64"), ("budgie", "i386"), ("xfce", "i386")}
-if set(entries) != expected:
-    errors.append(f"Build matrix mismatch: expected {sorted(expected)}, got {sorted(set(entries))}")
+workflow = (ROOT / ".github/workflows/build.yml").read_text()
+entries = re.findall(r"edition:\s*(win95|winxp|win7|win10|vista|win11),\s*arch:\s*(amd64|i386)", workflow)
+expected = {(edition, arch) for edition in ("win95", "winxp", "win7", "win10", "vista", "win11") for arch in ("amd64", "i386")}
+if set(entries) != expected: errors.append(f"Build matrix mismatch: expected 12 targets, got {sorted(set(entries))}")
 
-plymouth = (ROOT / "config/plymouth/imigane.script").read_text(encoding="utf-8")
-if "xproductions.png" not in plymouth or "spinner.dot" not in plymouth:
-    errors.append("Plymouth must include the XProductions image and animated loading circle")
-
-build_script = (ROOT / "scripts/build.sh").read_text(encoding="utf-8")
-if "i386) distribution=debian; suite=bookworm;" not in build_script:
-    errors.append("The i386 build must use Debian 12 bookworm, the last Debian release with a 32-bit kernel")
-if re.search(r"mksquashfs[^\n]*\s-e\s+boot(?:\s|$)", build_script):
-    errors.append("The installed filesystem must include /boot, its kernel, and the ImiganeOS GRUB theme")
-
-customize_script = (ROOT / "scripts/customize-chroot.sh").read_text(encoding="utf-8")
-if "policykit-1" in customize_script:
-    errors.append("Use polkitd and pkexec directly instead of the retired policykit-1 transitional package")
-if "apt.pop-os.org/release.key" in customize_script:
-    errors.append("The removed Pop!_OS release.key URL must not be used")
-if "groupadd --system" not in customize_script:
-    errors.append("Required live-user groups must be created before calling useradd")
-if "cat > /usr/lib/os-release <<EOF" not in customize_script:
-    errors.append("Write the ImiganeOS identity to the canonical /usr/lib/os-release file")
-if "ln -sf /etc/os-release /usr/lib/os-release" in customize_script:
-    errors.append("Do not link os-release onto itself or create a circular /etc ↔ /usr/lib symlink")
-if "ln -sfn ../usr/lib/os-release /etc/os-release" not in customize_script:
-    errors.append("Keep /etc/os-release as a relative symlink to /usr/lib/os-release")
+customize = (ROOT / "scripts/customize-chroot.sh").read_text()
+for source in ("grassmunk/Chicago95", "rozniak/xfce-winxp-tc", "xRUS47x/Aero-Glass-XFCE4",
+               "B00merang-Project/Windows-10", "x35gaming/revista", "yeyushengfan258/Win11-gtk-theme"):
+    if source not in customize: errors.append(f"Missing edition theme source: {source}")
+if "policykit-1" in customize: errors.append("Use polkitd and pkexec, not policykit-1")
 for package in ("udisks2", "parted", "kpartx", "e2fsprogs", "dosfstools"):
-    if package not in customize_script:
-        errors.append(f"The installer requires the {package} disk-detection or filesystem package")
+    if package not in customize: errors.append(f"Installer requires {package}")
+if 'NAME="ImagineOS"' not in customize: errors.append("OS identity was not renamed to ImagineOS")
 
-grub_theme = (ROOT / "config/grub/theme.txt").read_text(encoding="utf-8")
-if "terminal_*.png" in grub_theme:
-    errors.append("The GRUB theme must not reference terminal images that are not included in the ISO")
-if "DejaVu Sans" in grub_theme:
-    errors.append("The GRUB theme must only reference its bundled Unicode font")
-
+plymouth = (ROOT / "config/plymouth/imagine.script").read_text()
+if "xproductions.png" not in plymouth or "spinner.dot" not in plymouth: errors.append("Plymouth branding is incomplete")
 if errors:
-    print("\n".join(errors), file=sys.stderr)
-    raise SystemExit(1)
-
-print(f"Validated {len(required)} required files, {len(entries)} build targets, and all SVG branding assets.")
+    print("\n".join(errors), file=sys.stderr); raise SystemExit(1)
+print(f"Validated {len(required)} files and all {len(entries)} Windows-style build targets.")

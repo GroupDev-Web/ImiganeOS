@@ -8,6 +8,6 @@
   <ellipse cx="1250" cy="470" rx="750" ry="670" fill="url(#glow)"/>
   <path d="M-40 891c338-326 531-150 837-313s405-356 1142-294" fill="none" stroke="url(#line)" stroke-opacity=".34" stroke-width="2"/>
   <path d="M-40 921c338-326 531-150 837-313s405-356 1142-294" fill="none" stroke="#80a8ff" stroke-opacity=".17" stroke-width="1"/>
-  <text x="92" y="972" fill="#eef5ff" font-family="DejaVu Sans, sans-serif" font-size="37" font-weight="700" letter-spacing="1">ImiganeOS</text>
+  <text x="92" y="972" fill="#eef5ff" font-family="DejaVu Sans, sans-serif" font-size="37" font-weight="700" letter-spacing="1">ImagineOS</text>
   <text x="95" y="1014" fill="#a9bdd5" font-family="DejaVu Sans, sans-serif" font-size="19" letter-spacing="3">BROUGHT TO YOU BY XPRODUCTIONS</text>
 </svg>

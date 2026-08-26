@@ -1,92 +1,35 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-flavor="${IMIGANE_FLAVOR:?Missing IMIGANE_FLAVOR}"
-architecture="${IMIGANE_ARCH:?Missing IMIGANE_ARCH}"
-distribution="${IMIGANE_DISTRO:?Missing IMIGANE_DISTRO}"
-version="${IMIGANE_VERSION:?Missing IMIGANE_VERSION}"
+edition="${IMAGINE_EDITION:?Missing IMAGINE_EDITION}"
+architecture="${IMAGINE_ARCH:?Missing IMAGINE_ARCH}"
+distribution="${IMAGINE_DISTRO:?Missing IMAGINE_DISTRO}"
+version="${IMAGINE_VERSION:?Missing IMAGINE_VERSION}"
 asset_dir=/tmp/imigane-assets
 config_dir=/tmp/imigane-config
 
-echo imiganeos > /etc/hostname
-cat > /etc/hosts <<'EOF'
-127.0.0.1 localhost
-127.0.1.1 imiganeos
-::1 localhost ip6-localhost ip6-loopback
-EOF
-
+echo imagineos > /etc/hostname
+printf '127.0.0.1 localhost\n127.0.1.1 imagineos\n::1 localhost ip6-localhost ip6-loopback\n' > /etc/hosts
 apt-get update
-base_packages=(
-  systemd-sysv dbus sudo locales udev network-manager network-manager-gnome
-  live-boot live-config live-config-systemd
-  plymouth plymouth-themes grub-pc-bin
-  calamares polkitd pkexec
-  xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core
-  pipewire wireplumber pavucontrol
-  curl wget ca-certificates gnupg
-  file-roller p7zip-full gparted
-  udisks2 parted kpartx util-linux lvm2 cryptsetup
-  e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs
-  efibootmgr os-prober zstd
-  desktop-base adwaita-icon-theme
-)
-
+packages=(systemd-sysv dbus sudo locales udev network-manager network-manager-gnome live-boot live-config live-config-systemd plymouth plymouth-themes grub-pc-bin calamares polkitd pkexec xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core pipewire wireplumber pavucontrol curl wget git ca-certificates gnupg rsync sassc file-roller p7zip-full gparted udisks2 parted kpartx util-linux lvm2 cryptsetup e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs efibootmgr os-prober zstd desktop-base adwaita-icon-theme xfce4 xfce4-goodies lightdm light-locker lightdm-gtk-greeter lightdm-webkit2-greeter thunar mousepad picom)
 if [[ "$distribution" == ubuntu ]]; then
-  base_packages+=(linux-image-generic linux-firmware grub-efi-amd64-bin firefox)
+  packages+=(linux-image-generic linux-firmware grub-efi-amd64-bin firefox)
 else
-  base_packages+=(linux-image-686-pae firmware-linux-free grub-efi-ia32-bin firefox-esr)
+  packages+=(linux-image-686-pae firmware-linux-free grub-efi-ia32-bin firefox-esr)
 fi
-
-case "$flavor" in
-  xfce) desktop_packages=(xfce4 xfce4-goodies lightdm lightdm-gtk-greeter thunar mousepad) ;;
-  budgie) desktop_packages=(budgie-desktop lightdm lightdm-gtk-greeter nautilus gnome-control-center gnome-terminal) ;;
-  cosmic)
-    if [[ "$architecture" != amd64 || "$distribution" != ubuntu ]]; then
-      echo 'COSMIC requires Ubuntu amd64.' >&2
-      exit 2
-    fi
-    apt-get install -y --no-install-recommends ca-certificates curl gnupg
-    install -d -m 0755 /etc/apt/keyrings
-    pop_key_fingerprint=63C46DF0140D738961429F4E204DD8AEC33A7AFF
-    curl --fail --show-error --location --retry 3 \
-      "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${pop_key_fingerprint}" \
-      | gpg --dearmor --yes --output /etc/apt/keyrings/pop-os.gpg
-    echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/pop-os.gpg] http://apt.pop-os.org/release noble main' > /etc/apt/sources.list.d/pop-os.list
-    apt-get update
-    if ! apt-cache show cosmic-session >/dev/null 2>&1; then
-      echo 'The Pop!_OS repository does not currently provide cosmic-session for Ubuntu noble.' >&2
-      exit 1
-    fi
-    desktop_packages=(cosmic-session cosmic-comp cosmic-panel cosmic-settings cosmic-files cosmic-term cosmic-greeter)
-    ;;
-  *) echo "Unsupported desktop: $flavor" >&2; exit 2 ;;
-esac
-
-apt-get install -y --no-install-recommends "${base_packages[@]}" "${desktop_packages[@]}"
-
+apt-get install -y --no-install-recommends "${packages[@]}"
 sed -i 's/^# *en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 update-locale LANG=en_US.UTF-8
 
-for required_group in sudo audio video netdev plugdev; do
-  if ! getent group "$required_group" >/dev/null; then
-    groupadd --system "$required_group"
-  fi
-done
-useradd --create-home --shell /bin/bash --groups sudo,audio,video,netdev,plugdev imigane
-echo 'imigane:imigane' | chpasswd
-echo 'imigane ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/90-imigane-live
-chmod 0440 /etc/sudoers.d/90-imigane-live
-
-install -d /usr/share/imiganeos /usr/share/backgrounds/imiganeos /usr/share/icons/hicolor/256x256/apps
-install -m 0644 "$asset_dir/logo.png" /usr/share/imiganeos/logo.png
-install -m 0644 "$asset_dir/logo.png" /usr/share/icons/hicolor/256x256/apps/imiganeos.png
-install -m 0644 "$asset_dir/wallpaper.png" /usr/share/backgrounds/imiganeos/imiganeos.png
-
+install -d /usr/share/imagineos /usr/share/backgrounds/imagineos /usr/share/icons/hicolor/256x256/apps
+install -m 0644 "$asset_dir/logo.png" /usr/share/imagineos/logo.png
+install -m 0644 "$asset_dir/logo.png" /usr/share/icons/hicolor/256x256/apps/imagineos.png
+install -m 0644 "$asset_dir/wallpaper.png" /usr/share/backgrounds/imagineos/imagineos.png
 cat > /usr/lib/os-release <<EOF
-NAME="ImiganeOS"
-PRETTY_NAME="ImiganeOS 1.0 Beta"
-ID=imiganeos
+NAME="ImagineOS"
+PRETTY_NAME="ImagineOS 1.0 Beta"
+ID=imagineos
 ID_LIKE="$distribution debian"
 VERSION="1.0 Beta"
 VERSION_ID="1.0"
@@ -96,94 +39,106 @@ BUG_REPORT_URL="https://github.com/GroupDev-Web/ImiganeOS/issues"
 EOF
 ln -sfn ../usr/lib/os-release /etc/os-release
 
-install -d /usr/share/plymouth/themes/imigane
-cp "$config_dir/plymouth/imigane.plymouth" "$config_dir/plymouth/imigane.script" /usr/share/plymouth/themes/imigane/
-cp "$asset_dir/logo.png" "$asset_dir/xproductions.png" "$asset_dir/spinner-dot.png" /usr/share/plymouth/themes/imigane/
-update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/imigane/imigane.plymouth 150
-update-alternatives --set default.plymouth /usr/share/plymouth/themes/imigane/imigane.plymouth
-
-install -d /boot/grub/themes/imigane /etc/default/grub.d
-cp "$config_dir/grub/theme.txt" /boot/grub/themes/imigane/theme.txt
-cp "$asset_dir/logo.png" /boot/grub/themes/imigane/logo.png
-cp "$asset_dir/wallpaper.png" /boot/grub/themes/imigane/background.png
-cp "$asset_dir"/select_*.png /boot/grub/themes/imigane/
-cat > /etc/default/grub.d/imiganeos.cfg <<'EOF'
-GRUB_DISTRIBUTOR="ImiganeOS"
-GRUB_THEME="/boot/grub/themes/imigane/theme.txt"
+install -d /usr/share/plymouth/themes/imagine
+cp "$config_dir/plymouth/imagine.plymouth" "$config_dir/plymouth/imagine.script" /usr/share/plymouth/themes/imagine/
+cp "$asset_dir/logo.png" "$asset_dir/xproductions.png" "$asset_dir/spinner-dot.png" /usr/share/plymouth/themes/imagine/
+update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/imagine/imagine.plymouth 150
+update-alternatives --set default.plymouth /usr/share/plymouth/themes/imagine/imagine.plymouth
+install -d /boot/grub/themes/imagine /etc/default/grub.d
+cp "$config_dir/grub/theme.txt" /boot/grub/themes/imagine/theme.txt
+cp "$asset_dir/logo.png" /boot/grub/themes/imagine/logo.png
+cp "$asset_dir/wallpaper.png" /boot/grub/themes/imagine/background.png
+cp "$asset_dir"/select_*.png /boot/grub/themes/imagine/
+cat > /etc/default/grub.d/imagineos.cfg <<'EOF'
+GRUB_DISTRIBUTOR="ImagineOS"
+GRUB_THEME="/boot/grub/themes/imagine/theme.txt"
 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
 GRUB_GFXMODE=auto
 EOF
 
-install -d /etc/calamares/modules /usr/share/calamares/branding/imiganeos
+install -d /etc/calamares/modules /usr/share/calamares/branding/imagineos
 cp "$config_dir/calamares/settings.conf" /etc/calamares/settings.conf
 cp "$config_dir/calamares/unpackfs.conf" /etc/calamares/modules/unpackfs.conf
 cp "$config_dir/calamares/bootloader.conf" /etc/calamares/modules/bootloader.conf
 cp "$config_dir/calamares/displaymanager.conf" /etc/calamares/modules/displaymanager.conf
-cp "$config_dir/calamares/branding.desc" "$config_dir/calamares/show.qml" /usr/share/calamares/branding/imiganeos/
-cp "$asset_dir/logo.png" "$asset_dir/wallpaper.png" /usr/share/calamares/branding/imiganeos/
+cp "$config_dir/calamares/branding.desc" "$config_dir/calamares/show.qml" /usr/share/calamares/branding/imagineos/
+cp "$asset_dir/logo.png" "$asset_dir/wallpaper.png" /usr/share/calamares/branding/imagineos/
+install -d /usr/share/applications /etc/skel/Desktop
+install -m 0755 "$config_dir/desktop/imagineos-installer.sh" /usr/local/bin/imagineos-installer
+install -m 0755 "$config_dir/desktop/imagineos-install.desktop" /usr/share/applications/imagineos-install.desktop
+install -m 0755 "$config_dir/desktop/imagineos-install.desktop" /etc/skel/Desktop/imagineos-install.desktop
 
-install -d /usr/share/applications /etc/skel/Desktop /home/imigane/Desktop
-install -m 0755 "$config_dir/desktop/imiganeos-installer.sh" /usr/local/bin/imiganeos-installer
-install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /usr/share/applications/imiganeos-install.desktop
-install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /etc/skel/Desktop/imiganeos-install.desktop
-install -m 0755 "$config_dir/desktop/imiganeos-install.desktop" /home/imigane/Desktop/imiganeos-install.desktop
-chown -R imigane:imigane /home/imigane
+theme_root=/usr/share/themes
+icon_root=/usr/share/icons
+work=/tmp/imagine-theme
+rm -rf "$work" && mkdir -p "$work" "$theme_root" "$icon_root"
+theme_name=Adwaita
+icon_name=Adwaita
+greeter=lightdm-gtk-greeter
+clone() { git clone --depth 1 "$1" "$2"; }
+copy_theme_dirs() { find "$1" -mindepth 1 -maxdepth 3 -type d \( -name gtk-3.0 -o -name xfwm4 \) -printf '%h\n' | sort -u | while read -r directory; do cp -a "$directory" "$theme_root/"; done; }
+first_theme() { find "$theme_root" -mindepth 1 -maxdepth 1 -type d -iname "$1" -printf '%f\n' | head -n1; }
 
-case "$flavor" in
-  xfce)
-    install -d /etc/xdg/xfce4/xfconf/xfce-perchannel-xml
-    cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-desktop" version="1.0">
-  <property name="backdrop" type="empty">
-    <property name="screen0" type="empty">
-      <property name="monitor0" type="empty">
-        <property name="workspace0" type="empty">
-          <property name="last-image" type="string" value="/usr/share/backgrounds/imiganeos/imiganeos.png"/>
-          <property name="image-style" type="int" value="5"/>
-        </property>
-      </property>
-    </property>
-  </property>
-</channel>
-EOF
-    desktop_session=xfce
+case "$edition" in
+  win95)
+    clone https://github.com/grassmunk/Chicago95.git "$work/Chicago95"
+    cp -a "$work/Chicago95/Theme/Chicago95" "$theme_root/"
+    cp -a "$work/Chicago95/Icons/Chicago95" "$icon_root/"
+    theme_name=Chicago95; icon_name=Chicago95
+    if [[ -d "$work/Chicago95/Lightdm/Chicago95" ]]; then
+      install -d /usr/share/lightdm-webkit/themes
+      cp -a "$work/Chicago95/Lightdm/Chicago95" /usr/share/lightdm-webkit/themes/Chicago95
+      greeter=lightdm-webkit2-greeter
+      printf '[greeter]\nwebkit_theme=Chicago95\n' > /etc/lightdm/lightdm-webkit2-greeter.conf
+    fi
     ;;
-  budgie)
-    install -d /etc/dconf/db/local.d
-    cat > /etc/dconf/db/local.d/00-imiganeos <<'EOF'
-[org/gnome/desktop/background]
-picture-uri='file:///usr/share/backgrounds/imiganeos/imiganeos.png'
-picture-uri-dark='file:///usr/share/backgrounds/imiganeos/imiganeos.png'
-[org/gnome/desktop/interface]
-color-scheme='prefer-dark'
-EOF
-    if command -v dconf >/dev/null 2>&1; then dconf update; fi
-    desktop_session=budgie-desktop
+  winxp)
+    clone https://github.com/rozniak/xfce-winxp-tc.git "$work/winxp"; copy_theme_dirs "$work/winxp"
+    cp -a "$work/winxp/icons/luna" "$icon_root/Luna"
+    theme_name=professional; icon_name=Luna
     ;;
-  cosmic) desktop_session=cosmic ;;
+  win7)
+    clone https://github.com/xRUS47x/Aero-Glass-XFCE4.git "$work/aero"; copy_theme_dirs "$work/aero"
+    theme_name="$(first_theme '*aero*')"; [[ -n "$theme_name" ]] || theme_name=Adwaita
+    find "$work/aero" -name picom.conf -print -quit | xargs -r -I{} install -m 0644 '{}' /etc/xdg/picom.conf
+    ;;
+  win10)
+    clone https://github.com/B00merang-Project/Windows-10.git "$work/win10"; copy_theme_dirs "$work/win10"
+    theme_name=win10
+    ;;
+  vista)
+    clone https://github.com/x35gaming/revista.git "$work/revista"; copy_theme_dirs "$work/revista"
+    theme_name="$(first_theme '*vista*')"; [[ -n "$theme_name" ]] || theme_name="$(first_theme '*revista*')"; [[ -n "$theme_name" ]] || theme_name=Adwaita
+    ;;
+  win11)
+    clone https://github.com/yeyushengfan258/Win11-gtk-theme.git "$work/win11"
+    install -d "$theme_root/Win11-Light/gtk-2.0" "$theme_root/Win11-Light/gtk-3.0" "$theme_root/Win11-Light/gtk-4.0" "$theme_root/Win11-Light/xfwm4"
+    cp -a "$work/win11/src/gtk-2.0/." "$theme_root/Win11-Light/gtk-2.0/"
+    cp -a "$work/win11/src/gtk/assets" "$theme_root/Win11-Light/gtk-3.0/"
+    cp -a "$work/win11/src/gtk/assets" "$theme_root/Win11-Light/gtk-4.0/"
+    cp -a "$work/win11/src/xfwm4/." "$theme_root/Win11-Light/xfwm4/"
+    cp "$work/win11/src/gtk/3.0/gtk-Light.css" "$theme_root/Win11-Light/gtk-3.0/gtk.css"
+    cp "$work/win11/src/gtk/4.0/gtk-Light.css" "$theme_root/Win11-Light/gtk-4.0/gtk.css"
+    clone https://github.com/yeyushengfan258/Win11-icon-theme.git "$work/win11-icons"
+    cp -a "$work/win11-icons/src" "$icon_root/Win11"
+    theme_name="$(first_theme 'Win11*Light*')"; [[ -n "$theme_name" ]] || theme_name="$(first_theme 'Win11*')"; [[ -n "$theme_name" ]] || theme_name=Adwaita
+    icon_name="$(find "$icon_root" -mindepth 1 -maxdepth 1 -type d -iname '*win11*' -printf '%f\n' | head -n1)"; [[ -n "$icon_name" ]] || icon_name=Adwaita
+    ;;
 esac
 
-if [[ "$flavor" != cosmic ]]; then
-  install -d /etc/lightdm/lightdm.conf.d
-  cat > /etc/lightdm/lightdm.conf.d/90-imiganeos.conf <<EOF
-[Seat:*]
-autologin-user=imigane
-autologin-user-timeout=0
-user-session=$desktop_session
-greeter-session=lightdm-gtk-greeter
+install -d /etc/xdg/xfce4/xfconf/xfce-perchannel-xml
+cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?><channel name="xsettings" version="1.0"><property name="Net" type="empty"><property name="ThemeName" type="string" value="$theme_name"/><property name="IconThemeName" type="string" value="$icon_name"/></property></channel>
 EOF
-  cat > /etc/lightdm/lightdm-gtk-greeter.conf <<'EOF'
-[greeter]
-background=/usr/share/backgrounds/imiganeos/imiganeos.png
-theme-name=Adwaita-dark
-icon-theme-name=Adwaita
+cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<EOF
+<?xml version="1.0" encoding="UTF-8"?><channel name="xfwm4" version="1.0"><property name="general" type="empty"><property name="theme" type="string" value="$theme_name"/></property></channel>
 EOF
-  systemctl enable lightdm
-else
-  systemctl enable cosmic-greeter
-fi
-
-systemctl enable NetworkManager
+cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?><channel name="xfce4-desktop" version="1.0"><property name="backdrop" type="empty"><property name="screen0" type="empty"><property name="monitor0" type="empty"><property name="workspace0" type="empty"><property name="last-image" type="string" value="/usr/share/backgrounds/imagineos/imagineos.png"/><property name="image-style" type="int" value="5"/></property></property></property></property></channel>
+EOF
+install -d /etc/lightdm/lightdm.conf.d
+printf '[Seat:*]\nuser-session=xfce\ngreeter-session=%s\n' "$greeter" > /etc/lightdm/lightdm.conf.d/90-imagineos.conf
+printf '[greeter]\nbackground=/usr/share/backgrounds/imagineos/imagineos.png\ntheme-name=%s\nicon-theme-name=%s\n' "$theme_name" "$icon_name" > /etc/lightdm/lightdm-gtk-greeter.conf
+systemctl enable lightdm NetworkManager
 update-initramfs -u -k all
 apt-get clean

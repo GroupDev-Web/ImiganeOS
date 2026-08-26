@@ -2,19 +2,19 @@
 set -Eeuo pipefail
 
 root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-flavor=""
+edition=""
 architecture=""
-version="${IMIGANE_VERSION:-1.0-beta}"
+version="${IMAGINE_VERSION:-1.0-beta}"
 
 usage() {
   cat <<'USAGE'
-Usage: sudo ./scripts/build.sh --flavor budgie|xfce|cosmic --arch amd64|i386
+Usage: sudo ./scripts/build.sh --edition win95|winxp|win7|win10|vista|win11 --arch amd64|i386
 USAGE
 }
 
 while (($#)); do
   case "$1" in
-    --flavor) flavor="${2:?Missing flavor}"; shift 2 ;;
+    --edition) edition="${2:?Missing edition}"; shift 2 ;;
     --arch) architecture="${2:?Missing architecture}"; shift 2 ;;
     --version) version="${2:?Missing version}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
@@ -22,12 +22,8 @@ while (($#)); do
   esac
 done
 
-case "$flavor" in budgie|xfce|cosmic) ;; *) usage; exit 2 ;; esac
+case "$edition" in win95|winxp|win7|win10|vista|win11) ;; *) usage; exit 2 ;; esac
 case "$architecture" in amd64|i386) ;; *) usage; exit 2 ;; esac
-if [[ "$architecture" == i386 && "$flavor" == cosmic ]]; then
-  echo 'COSMIC is not supported for x86.' >&2
-  exit 2
-fi
 if [[ "$EUID" -ne 0 ]]; then
   echo 'This script requires root because debootstrap and chroot need elevated privileges.' >&2
   exit 1
@@ -38,13 +34,13 @@ case "$architecture" in
   i386) distribution=debian; suite=bookworm; mirror=http://deb.debian.org/debian; arch_label=x86; efi_target=i386-efi ;;
 esac
 
-job_name="${flavor}-${arch_label}"
+job_name="${edition}-${arch_label}"
 work_dir="$root_dir/work/$job_name"
 chroot_dir="$work_dir/chroot"
 iso_dir="$work_dir/iso"
 asset_dir="$work_dir/assets"
 dist_dir="$root_dir/dist"
-iso_name="ImiganeOS-${version}-${flavor}-${arch_label}.iso"
+iso_name="ImagineOS-${version}-${edition}-${arch_label}.iso"
 
 cleanup() {
   for mountpoint in dev/pts dev proc sys run; do
@@ -55,8 +51,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "Building ImiganeOS $version: $flavor / $arch_label ($distribution $suite)"
-mkdir -p "$work_dir" "$iso_dir/live" "$iso_dir/boot/grub/themes/imigane" "$dist_dir"
+echo "Building ImagineOS $version: $edition / $arch_label ($distribution $suite)"
+mkdir -p "$work_dir" "$iso_dir/live" "$iso_dir/boot/grub/themes/imagine" "$dist_dir"
 "$root_dir/scripts/generate-assets.sh" "$asset_dir"
 
 if [[ ! -e "$chroot_dir/etc/debian_version" ]]; then
@@ -91,10 +87,10 @@ cp "$root_dir/scripts/customize-chroot.sh" "$chroot_dir/tmp/customize-chroot.sh"
 
 chroot "$chroot_dir" /usr/bin/env \
   DEBIAN_FRONTEND=noninteractive \
-  IMIGANE_FLAVOR="$flavor" \
-  IMIGANE_ARCH="$architecture" \
-  IMIGANE_DISTRO="$distribution" \
-  IMIGANE_VERSION="$version" \
+  IMAGINE_EDITION="$edition" \
+  IMAGINE_ARCH="$architecture" \
+  IMAGINE_DISTRO="$distribution" \
+  IMAGINE_VERSION="$version" \
   bash /tmp/customize-chroot.sh
 
 kernel_file="$(find "$chroot_dir/boot" -maxdepth 1 -name 'vmlinuz-*' | sort -V | tail -n 1)"
@@ -112,10 +108,10 @@ du -sx --block-size=1 "$chroot_dir" | cut -f1 > "$iso_dir/live/filesystem.size"
 chroot "$chroot_dir" dpkg-query -W --showformat='${Package} ${Version}\n' > "$iso_dir/live/filesystem.manifest"
 
 cp "$root_dir/config/grub/grub.cfg" "$iso_dir/boot/grub/grub.cfg"
-cp "$root_dir/config/grub/theme.txt" "$iso_dir/boot/grub/themes/imigane/theme.txt"
-cp "$asset_dir/logo.png" "$iso_dir/boot/grub/themes/imigane/logo.png"
-cp "$asset_dir/wallpaper.png" "$iso_dir/boot/grub/themes/imigane/background.png"
-cp "$asset_dir"/select_*.png "$iso_dir/boot/grub/themes/imigane/"
+cp "$root_dir/config/grub/theme.txt" "$iso_dir/boot/grub/themes/imagine/theme.txt"
+cp "$asset_dir/logo.png" "$iso_dir/boot/grub/themes/imagine/logo.png"
+cp "$asset_dir/wallpaper.png" "$iso_dir/boot/grub/themes/imagine/background.png"
+cp "$asset_dir"/select_*.png "$iso_dir/boot/grub/themes/imagine/"
 mkdir -p "$iso_dir/boot/grub/fonts"
 font_source="$(find /usr/share/grub /usr/share/grub2 -name unicode.pf2 -print -quit 2>/dev/null || true)"
 if [[ -z "$font_source" ]]; then
@@ -125,18 +121,18 @@ fi
 cp "$font_source" "$iso_dir/boot/grub/fonts/unicode.pf2"
 
 cat > "$iso_dir/.disk-info" <<EOF
-ImiganeOS $version $flavor $arch_label — Brought to you by XProductions
+ImagineOS $version $edition $arch_label — Brought to you by XProductions
 EOF
 
 grub-mkrescue \
   -o "$dist_dir/$iso_name" \
   --modules='normal part_msdos part_gpt fat iso9660 all_video gfxterm png font linux reboot halt search search_fs_file' \
   "$iso_dir" \
-  -- -volid 'IMIGANE_OS'
+  -- -volid 'IMAGINE_OS'
 
 (cd "$dist_dir" && sha256sum "$iso_name" > "$iso_name.sha256")
-cat > "$dist_dir/ImiganeOS-${version}-${flavor}-${arch_label}.json" <<EOF
-{"name":"ImiganeOS","version":"$version","flavor":"$flavor","architecture":"$arch_label","base":"$distribution","suite":"$suite","iso":"$iso_name"}
+cat > "$dist_dir/ImagineOS-${version}-${edition}-${arch_label}.json" <<EOF
+{"name":"ImagineOS","version":"$version","edition":"$edition","architecture":"$arch_label","base":"$distribution","suite":"$suite","iso":"$iso_name"}
 EOF
 
 echo "Finished: $dist_dir/$iso_name"

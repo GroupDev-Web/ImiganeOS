@@ -1,4 +1,4 @@
-name: Build ImiganeOS
+name: Build ImagineOS
 
 on:
   push:
@@ -8,11 +8,11 @@ on:
       - 'website/**'
   workflow_dispatch:
     inputs:
-      flavor:
-        description: Edition to build, or all
+      edition:
+        description: Windows experience to build, or all
         type: choice
         default: all
-        options: [all, budgie, xfce, cosmic]
+        options: [all, win95, winxp, win7, win10, vista, win11]
       architecture:
         description: Processor architecture, or all
         type: choice
@@ -27,7 +27,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: imiganeos-${{ github.ref }}-${{ github.event_name }}
+  group: imagineos-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
@@ -39,20 +39,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { flavor: budgie, arch: amd64, label: 'Budgie · x86_64', artifact: ImiganeOS-Budgie-x86_64 }
-          - { flavor: xfce, arch: amd64, label: 'XFCE · x86_64', artifact: ImiganeOS-XFCE-x86_64 }
-          - { flavor: cosmic, arch: amd64, label: 'COSMIC · x86_64', artifact: ImiganeOS-COSMIC-x86_64 }
-          - { flavor: budgie, arch: i386, label: 'Budgie · x86', artifact: ImiganeOS-Budgie-x86 }
-          - { flavor: xfce, arch: i386, label: 'XFCE · x86', artifact: ImiganeOS-XFCE-x86 }
+          - { edition: win95, arch: amd64, label: 'Windows 95 · x86_64', artifact: ImagineOS-Windows-95-x86_64 }
+          - { edition: winxp, arch: amd64, label: 'Windows XP · x86_64', artifact: ImagineOS-Windows-XP-x86_64 }
+          - { edition: win7, arch: amd64, label: 'Windows 7 · x86_64', artifact: ImagineOS-Windows-7-x86_64 }
+          - { edition: win10, arch: amd64, label: 'Windows 10 · x86_64', artifact: ImagineOS-Windows-10-x86_64 }
+          - { edition: vista, arch: amd64, label: 'Windows Vista · x86_64', artifact: ImagineOS-Windows-Vista-x86_64 }
+          - { edition: win11, arch: amd64, label: 'Windows 11 · x86_64', artifact: ImagineOS-Windows-11-x86_64 }
+          - { edition: win95, arch: i386, label: 'Windows 95 · x86', artifact: ImagineOS-Windows-95-x86 }
+          - { edition: winxp, arch: i386, label: 'Windows XP · x86', artifact: ImagineOS-Windows-XP-x86 }
+          - { edition: win7, arch: i386, label: 'Windows 7 · x86', artifact: ImagineOS-Windows-7-x86 }
+          - { edition: win10, arch: i386, label: 'Windows 10 · x86', artifact: ImagineOS-Windows-10-x86 }
+          - { edition: vista, arch: i386, label: 'Windows Vista · x86', artifact: ImagineOS-Windows-Vista-x86 }
+          - { edition: win11, arch: i386, label: 'Windows 11 · x86', artifact: ImagineOS-Windows-11-x86 }
 
     steps:
       - name: Check requested build selection
         id: selected
         shell: bash
         run: |
-          flavor="${{ github.event.inputs.flavor || 'all' }}"
+          edition="${{ github.event.inputs.edition || 'all' }}"
           architecture="${{ github.event.inputs.architecture || 'all' }}"
-          if [[ "$flavor" != all && "$flavor" != '${{ matrix.flavor }}' ]]; then
+          if [[ "$edition" != all && "$edition" != '${{ matrix.edition }}' ]]; then
             echo 'build=false' >> "$GITHUB_OUTPUT"
           elif [[ "$architecture" != all && "$architecture" != '${{ matrix.arch }}' ]]; then
             echo 'build=false' >> "$GITHUB_OUTPUT"
@@ -60,7 +67,7 @@ jobs:
             echo 'build=true' >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check out ImiganeOS
+      - name: Check out ImagineOS
         if: steps.selected.outputs.build == 'true'
         uses: actions/checkout@v4
 
@@ -84,7 +91,7 @@ jobs:
         run: |
           chmod +x scripts/*.sh
           sudo ./scripts/build.sh \
-            --flavor '${{ matrix.flavor }}' \
+            --edition '${{ matrix.edition }}' \
             --arch '${{ matrix.arch }}' \
             --version '${{ github.event.inputs.version || '1.0-beta' }}'
           sudo chown -R "$USER:$USER" dist
@@ -97,7 +104,7 @@ jobs:
           cd dist
           sha256sum -c ./*.sha256
 
-      - name: Upload ImiganeOS artifact
+      - name: Upload ImagineOS artifact
         if: steps.selected.outputs.build == 'true'
         uses: actions/upload-artifact@v4
         with:

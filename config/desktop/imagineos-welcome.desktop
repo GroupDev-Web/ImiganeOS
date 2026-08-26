@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Welcome to ImiganeOS
-Exec=imiganeos-welcome
-Icon=imiganeos
+Name=Welcome to ImagineOS
+Exec=imagineos-welcome
+Icon=imagineos
 Terminal=false
 Categories=System;
 X-GNOME-Autostart-enabled=true

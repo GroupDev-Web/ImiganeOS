@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Install ImiganeOS
+Name=Install ImagineOS
 GenericName=System Installer
-Comment=Install ImiganeOS on this computer
-Exec=/usr/local/bin/imiganeos-installer
-Icon=imiganeos
+Comment=Install ImagineOS on this computer
+Exec=/usr/local/bin/imagineos-installer
+Icon=imagineos
 Terminal=false
 Categories=System;Settings;
 StartupNotify=true

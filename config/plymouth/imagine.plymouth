@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=ImagineOS
+Description=ImagineOS animated boot screen by XProductions
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/imagine
+ScriptFile=/usr/share/plymouth/themes/imagine/imagine.script
