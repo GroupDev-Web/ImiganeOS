@@ -2,16 +2,14 @@
 set -Eeuo pipefail
 
 edition="${IMAGINE_EDITION:?Missing IMAGINE_EDITION}"
-architecture="${IMAGINE_ARCH:?Missing IMAGINE_ARCH}"
 distribution="${IMAGINE_DISTRO:?Missing IMAGINE_DISTRO}"
-version="${IMAGINE_VERSION:?Missing IMAGINE_VERSION}"
 asset_dir=/tmp/imigane-assets
 config_dir=/tmp/imigane-config
 
 echo imagineos > /etc/hostname
 printf '127.0.0.1 localhost\n127.0.1.1 imagineos\n::1 localhost ip6-localhost ip6-loopback\n' > /etc/hosts
 apt-get update
-packages=(systemd-sysv dbus sudo locales udev network-manager network-manager-gnome live-boot live-config live-config-systemd plymouth plymouth-themes grub-pc-bin calamares polkitd pkexec xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core pipewire wireplumber pavucontrol curl wget git ca-certificates gnupg rsync sassc file-roller p7zip-full gparted udisks2 parted kpartx util-linux lvm2 cryptsetup e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs efibootmgr os-prober zstd desktop-base adwaita-icon-theme xfce4 xfce4-goodies lightdm light-locker lightdm-gtk-greeter lightdm-webkit2-greeter thunar mousepad picom)
+packages=(systemd-sysv dbus sudo locales udev network-manager network-manager-gnome live-boot live-config live-config-systemd plymouth plymouth-themes grub-pc-bin calamares polkitd pkexec xorg xserver-xorg-video-all fonts-dejavu fonts-noto-core pipewire wireplumber pavucontrol curl wget git ca-certificates gnupg rsync sassc file-roller p7zip-full gparted udisks2 parted kpartx util-linux lvm2 cryptsetup e2fsprogs dosfstools btrfs-progs ntfs-3g exfatprogs xfsprogs efibootmgr os-prober zstd desktop-base adwaita-icon-theme xfce4 xfce4-goodies lightdm light-locker lightdm-gtk-greeter thunar mousepad picom)
 if [[ "$distribution" == ubuntu ]]; then
   packages+=(linux-image-generic linux-firmware grub-efi-amd64-bin firefox)
 else
@@ -86,10 +84,14 @@ case "$edition" in
     cp -a "$work/Chicago95/Icons/Chicago95" "$icon_root/"
     theme_name=Chicago95; icon_name=Chicago95
     if [[ -d "$work/Chicago95/Lightdm/Chicago95" ]]; then
-      install -d /usr/share/lightdm-webkit/themes
-      cp -a "$work/Chicago95/Lightdm/Chicago95" /usr/share/lightdm-webkit/themes/Chicago95
-      greeter=lightdm-webkit2-greeter
-      printf '[greeter]\nwebkit_theme=Chicago95\n' > /etc/lightdm/lightdm-webkit2-greeter.conf
+      if apt-cache show lightdm-webkit2-greeter >/dev/null 2>&1 && apt-get install -y --no-install-recommends lightdm-webkit2-greeter; then
+        install -d /usr/share/lightdm-webkit/themes
+        cp -a "$work/Chicago95/Lightdm/Chicago95" /usr/share/lightdm-webkit/themes/Chicago95
+        greeter=lightdm-webkit2-greeter
+        printf '[greeter]\nwebkit_theme=Chicago95\n' > /etc/lightdm/lightdm-webkit2-greeter.conf
+      else
+        echo 'lightdm-webkit2-greeter is unavailable; using the GTK greeter for the Windows 95 edition.'
+      fi
     fi
     ;;
   winxp)
@@ -100,7 +102,10 @@ case "$edition" in
   win7)
     clone https://github.com/xRUS47x/Aero-Glass-XFCE4.git "$work/aero"; copy_theme_dirs "$work/aero"
     theme_name="$(first_theme '*aero*')"; [[ -n "$theme_name" ]] || theme_name=Adwaita
-    find "$work/aero" -name picom.conf -print -quit | xargs -r -I{} install -m 0644 '{}' /etc/xdg/picom.conf
+    picom_conf="$(find "$work/aero" -name picom.conf -print -quit)"
+    if [[ -n "$picom_conf" ]]; then
+      install -m 0644 "$picom_conf" /etc/xdg/picom.conf
+    fi
     ;;
   win10)
     clone https://github.com/B00merang-Project/Windows-10.git "$work/win10"; copy_theme_dirs "$work/win10"
