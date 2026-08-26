@@ -2,7 +2,19 @@ name: Validate ImiganeOS
 
 on:
   push:
+    paths-ignore:
+      - 'README.md'
+      - 'website/**'
+      - 'index.html'
+      - 'site.css'
+      - 'site.js'
   pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'website/**'
+      - 'index.html'
+      - 'site.css'
+      - 'site.js'
 
 permissions:
   contents: read
