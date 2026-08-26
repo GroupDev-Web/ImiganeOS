@@ -50,7 +50,7 @@ jobs:
           - { edition: win11, arch: amd64, label: 'Windows 11 · x86_64', artifact: ImagineOS-Windows-11-x86_64 }
           - { edition: win95, arch: i386, label: 'Windows 95 · x86', artifact: ImagineOS-Windows-95-x86 }
           - { edition: winxp, arch: i386, label: 'Windows XP · x86', artifact: ImagineOS-Windows-XP-x86 }
-          - { edition: win7, arch: i386, label: 'Windows 7 · x86', artifact: ImagineOS-Windows-Windows-7-x86 }
+          - { edition: win7, arch: i386, label: 'Windows 7 · x86', artifact: ImagineOS-Windows-7-x86 }
           - { edition: win10, arch: i386, label: 'Windows 10 · x86', artifact: ImagineOS-Windows-10-x86 }
           - { edition: vista, arch: i386, label: 'Windows Vista · x86', artifact: ImagineOS-Windows-Vista-x86 }
           - { edition: win11, arch: i386, label: 'Windows 11 · x86', artifact: ImagineOS-Windows-11-x86 }
