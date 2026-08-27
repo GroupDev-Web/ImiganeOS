@@ -59,6 +59,7 @@ cp "$config_dir/calamares/settings.conf" /etc/calamares/settings.conf
 cp "$config_dir/calamares/unpackfs.conf" /etc/calamares/modules/unpackfs.conf
 cp "$config_dir/calamares/bootloader.conf" /etc/calamares/modules/bootloader.conf
 cp "$config_dir/calamares/displaymanager.conf" /etc/calamares/modules/displaymanager.conf
+cp "$config_dir/calamares/partition.conf" /etc/calamares/modules/partition.conf
 cp "$config_dir/calamares/branding.desc" "$config_dir/calamares/show.qml" /usr/share/calamares/branding/imagineos/
 cp "$asset_dir/logo.png" "$asset_dir/wallpaper.png" /usr/share/calamares/branding/imagineos/
 install -d /usr/share/applications /etc/skel/Desktop
@@ -131,18 +132,27 @@ case "$edition" in
     ;;
 esac
 
-install -d /etc/xdg/xfce4/xfconf/xfce-perchannel-xml
-cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml <<EOF
+xfce_defaults=/etc/xdg/xfce4/xfconf/xfce-perchannel-xml
+install -d "$xfce_defaults"
+cat > "$xfce_defaults/xsettings.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?><channel name="xsettings" version="1.0"><property name="Net" type="empty"><property name="ThemeName" type="string" value="$theme_name"/><property name="IconThemeName" type="string" value="$icon_name"/></property></channel>
 EOF
-cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<EOF
+cat > "$xfce_defaults/xfwm4.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?><channel name="xfwm4" version="1.0"><property name="general" type="empty"><property name="theme" type="string" value="$theme_name"/></property></channel>
 EOF
-cat > /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml <<'EOF'
+cat > "$xfce_defaults/xfce4-desktop.xml" <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?><channel name="xfce4-desktop" version="1.0"><property name="backdrop" type="empty"><property name="screen0" type="empty"><property name="monitor0" type="empty"><property name="workspace0" type="empty"><property name="last-image" type="string" value="/usr/share/backgrounds/imagineos/imagineos.png"/><property name="image-style" type="int" value="5"/></property></property></property></property></channel>
 EOF
+
+# live-config and Calamares both create users from /etc/skel. Copy the edition
+# defaults there too so the live desktop and the installed desktop do not fall
+# back to stock Xfce settings on first login.
+skel_xfce=/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+install -d "$skel_xfce"
+cp "$xfce_defaults/xsettings.xml" "$xfce_defaults/xfwm4.xml" "$xfce_defaults/xfce4-desktop.xml" "$skel_xfce/"
+
 install -d /etc/lightdm/lightdm.conf.d
-printf '[Seat:*]\nuser-session=xfce\ngreeter-session=%s\n' "$greeter" > /etc/lightdm/lightdm.conf.d/90-imagineos.conf
+printf '[Seat:*]\nuser-session=xfce\nautologin-user=imagine\nautologin-user-timeout=0\nautologin-session=xfce\ngreeter-session=%s\n' "$greeter" > /etc/lightdm/lightdm.conf.d/90-imagineos.conf
 printf '[greeter]\nbackground=/usr/share/backgrounds/imagineos/imagineos.png\ntheme-name=%s\nicon-theme-name=%s\n' "$theme_name" "$icon_name" > /etc/lightdm/lightdm-gtk-greeter.conf
 systemctl enable lightdm NetworkManager
 update-initramfs -u -k all
